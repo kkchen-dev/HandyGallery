@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 import gridfs
 
 class GalleryDB:
-    def __init__(self, host="localhost", port=50000, maxSevSelDelay=10):
+    def __init__(self, host="localhost", port=23456, maxSevSelDelay=10):
         try:
             client = pymongo.MongoClient(host, 
                                          port=port,
