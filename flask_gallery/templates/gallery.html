@@ -22,7 +22,11 @@
         {% for tagtype in tags %}
             <span style="font-size: 10px;">{{ tagtype }}:</span>
             {% for tag, tagcount in tags[tagtype] %}
-                <a class="tags" href="{{ url_for('tagged_gallery', tag=tagtype+':'+tag, allbooks=allbooks, read=read) }}">{{ tag }}
+                <a class="tags" href="{{ url_for('render_gallery', 
+                                                 tag=tagtype+':'+tag, 
+                                                 allbooks=allbooks, 
+                                                 read=read) }}">
+                    {{ tag }}
                     {% set percent = tagcount / maxcount %}
                     {% set count_color = "rgb(160, 160, 255)" %}
                     {% if percent < 0.25 %}
@@ -55,7 +59,7 @@
             <div class="book_covers">
                 <div class="book_titles">
                     <a href="{{ url_for('bookpage', book_id=book['_id'], contents=book['contents']) }}">
-                        {{ book["title"] }} ({{ book["contents"] | length }}p)
+                        {{ book["title"] }}
                     </a>
                 </div>
                 <div class="book_thumbnails">
@@ -63,8 +67,10 @@
                         <img class="thumbnails" src="{{ url_for('get_image', pid=book['thumbnail']) }}" alt="thumbnail">
                     </a>
                 </div>
-                <div class="added_dates">
-                    Date Added: {{ book["date_added"] }}
+                <div class="book_cover_footers">
+                    <div class="row justify-content-between">
+                        <div class="col-8">{{ book["date_added"] }}</div><div class="col-4">{{ book["contents"] | length }} pages</div>
+                    </div>
                 </div>
             </div>
         {% endfor %}

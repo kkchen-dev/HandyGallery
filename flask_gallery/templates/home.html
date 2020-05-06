@@ -1,6 +1,31 @@
 {% extends "layout.html" %}
+{% block style %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='gallery.css') }}">
+{% endblock style %}
 {% block content %}
-    <div class="content-section">
-        <h1>Welcome!</h1>
+    <div class="content-section" style="margin-top: 10px; text-align: center;">
+        <h1>Five Random Unread Books</h1>
+        <h3>Total: {{ total_length }} | Unread: {{ unread_length }}</h3>
+    </div>
+    <div id="bookshelf" class="content-section row row-cols-3 row-cols-lg-5">
+        {% for book in books[::-1] %}
+            <div class="book_covers">
+                <div class="book_titles">
+                    <a href="{{ url_for('bookpage', book_id=book['_id'], contents=book['contents']) }}">
+                        {{ book["title"] }}
+                    </a>
+                </div>
+                <div class="book_thumbnails">
+                    <a href="{{ url_for('bookpage', book_id=book['_id'], contents=book['contents']) }}">
+                        <img class="thumbnails" src="{{ url_for('get_image', pid=book['thumbnail']) }}" alt="thumbnail">
+                    </a>
+                </div>
+                <div class="book_cover_footers">
+                    <div class="row justify-content-between">
+                        <div class="col-8">{{ book["date_added"] }}</div><div class="col-4">{{ book["contents"] | length }} pages</div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
     </div>
 {% endblock content %}
