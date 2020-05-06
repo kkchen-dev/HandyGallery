@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 import gridfs
 
 class GalleryDB:
-    def __init__(self, host="localhost", port=23456, maxSevSelDelay=10):
+    def __init__(self, host="localhost", port=27127, maxSevSelDelay=10):
         try:
             client = pymongo.MongoClient(host, 
                                          port=port,
@@ -56,16 +56,19 @@ class GalleryDB:
     def get_all_tags(self, books=None):
         if books == None:
             tagset = set(tag["tag"] for tag in self.db["tag_collection"].find())
+            tagcounter = collections.Counter(tag["tag"] for tag in self.db["tag_collection"].find())
         else:
             book_ids = set([str(book["_id"]) for book in books])
             tagset = set()
+            tagcounter = collections.Counter()
             for tag in self.db["tag_collection"].find():
                 if tag["book_id"] in book_ids:
                     tagset.add(tag["tag"])
+                    tagcounter[tag["tag"]] += 1
         tagdict = collections.defaultdict(list)
         for tag in tagset:
             tagtype, tagvalue = tag.split(":")
-            tagdict[tagtype].append(tagvalue)
+            tagdict[tagtype].append((tagvalue, tagcounter[tag]))
         for key in tagdict:
             tagdict[key].sort()
         return tagdict
