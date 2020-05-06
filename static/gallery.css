@@ -1,0 +1,44 @@
+#tag_container {
+    display: none;
+    padding: 0px 5px 5px 5px;
+}
+
+#bookshelf {
+    background: #333;
+    border: 1px solid #999;
+    padding: 0px;
+}
+
+.book_covers {
+    font-size: 8px;
+    text-align: center;
+    height: 300px;
+    border: 1px solid #999;
+    padding: 0px 5px 0px 5px;
+}
+
+.book_titles a {
+    color: #ddd;
+    display: block;
+    height: 25px;
+}
+
+.book_titles a:hover {
+    color: #fff;
+}
+
+.book_thumbnails{
+    display: block;
+    height: 260px;
+}
+
+.thumbnails {
+    position: relative;
+    max-width: 95%;
+    max-height: 255px;
+}
+
+.added_dates {
+    position: relative;
+    bottom: 0px;
+}

@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block style %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='gallery.css') }}">
+{% endblock style %}
+{% block script %}
+    <script>
+        function toggle_tag_container() {
+            var tag_container = document.getElementById("tag_container");
+            if (tag_container.style.display === "block") {
+                tag_container.style.display = "none";
+            } else {
+                tag_container.style.display = "block";
+            }
+        }
+    </script>
+{% endblock %}
+{% block content %}
+    <div class="button-container row justify-content-center" style="margin-top: 10px;">
+        <button type="button" class="btn btn-secondary btn-sm col-2" onclick="toggle_tag_container()">Toggle Tag Container</button>
+    </div>
+    <div id="tag_container" class="content-section">
+        {% for tagtype in tags %}
+            <span style="font-size: 10px;">{{ tagtype }}:</span>
+            {% for tag in tags[tagtype] %}
+                <a class="tags" href="{{ url_for('tagged_gallery', tag=tagtype+':'+tag, allbooks=allbooks, read=read) }}">{{ tag }}</a>
+            {% endfor %}
+            <br />
+        {% endfor %}
+    </div>
+    <div id="bookshelf" class="content-section row row-cols-3 row-cols-lg-5">
+        {% for book in books[::-1] %}
+            <div class="book_covers">
+                <div class="book_titles">
+                    <a href="{{ url_for('bookpage', book_id=book['_id'], contents=book['contents']) }}">
+                        {{ book["title"] }} ({{ book["contents"] | length }}p)
+                    </a>
+                </div>
+                <div class="book_thumbnails">
+                    <a href="{{ url_for('bookpage', book_id=book['_id'], contents=book['contents']) }}">
+                        <img class="thumbnails" src="{{ url_for('get_image', pid=book['thumbnail']) }}" alt="thumbnail">
+                    </a>
+                </div>
+                <div class="added_dates">
+                    Date Added: {{ book["date_added"] }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock content %}

@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block style %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='book.css') }}">
+{% endblock style %}
+{% block content %}
+    <div id="tag_container" class="content-section">
+        {% for key in tags %}
+            <span class="tag_type"> {{ key }} </span>
+            {% for tag in tags[key] %}
+                <a class="tags" href="{{ url_for('tagged_gallery', tag=key+tag, allbooks=True, read=False) }}">{{ tag }}</a>
+            {% endfor %}
+            <br />
+        {% endfor %}
+    </div>
+    <div style="text-align: center; font-weight: bold; font-size: 8px;">
+        {% if read %}
+            <div style="float:right;" class="bg-success col-1">Read</div>
+        {% else %}
+            <div style="float:right;" class="bg-danger col-1">Unread</div>
+        {% endif %}
+    </div>
+    <div id="book_container">
+        {% for img in imgs %}
+            <img class="imgs col-8 align-self-center" src="{{ url_for('get_image', pid=img) }}" alt="img_page">
+            <div class="page_numbers">{{ loop.index }}</div>
+        {% endfor %}
+    </div>
+    <div class="button-container row justify-content-center" style="margin: 10px 0px 10px 0px;">
+        <form method="POST" action="">
+            {% if read %}
+                {{ form.submit(class="btn btn-danger btn-lg", value="Set Unread") }}
+            {% else %}
+                {{ form.submit(class="btn btn-success btn-lg", value="Set Read") }}
+            {% endif %}
+        </form>
+    </div>
+{% endblock content %}

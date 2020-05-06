@@ -1,0 +1,20 @@
+#tag_container {
+    margin-bottom: 0px;
+    padding: 0px 5px 5px 5px;
+}
+
+#book_container {
+    background: #333;
+    border: 1px solid #999;
+    text-align: center;
+    margin-top: 12px;
+}
+
+.imgs {
+    margin-top: 20px;
+}
+
+.page_numbers {
+    color:#ccc;
+    font-size: 10px;
+}
