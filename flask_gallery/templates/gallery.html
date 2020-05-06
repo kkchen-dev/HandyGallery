@@ -21,8 +21,31 @@
     <div id="tag_container" class="content-section">
         {% for tagtype in tags %}
             <span style="font-size: 10px;">{{ tagtype }}:</span>
-            {% for tag in tags[tagtype] %}
-                <a class="tags" href="{{ url_for('tagged_gallery', tag=tagtype+':'+tag, allbooks=allbooks, read=read) }}">{{ tag }}</a>
+            {% for tag, tagcount in tags[tagtype] %}
+                <a class="tags" href="{{ url_for('tagged_gallery', tag=tagtype+':'+tag, allbooks=allbooks, read=read) }}">{{ tag }}
+                    {% set percent = tagcount / maxcount %}
+                    {% set count_color = "rgb(160, 160, 255)" %}
+                    {% if percent < 0.25 %}
+                        {% set count_color = "rgb(160, 255, 160)" %}
+                    {% elif 0.25 <= percent < 0.5 %}
+                        {% set count_color = "rgb(225, 255, 160)" %}
+                    {% elif 0.5 <= percent < 0.75 %}
+                        {% set count_color = "rgb(255, 225, 160)" %}
+                    {% elif 0.75 <= percent < 1 %}
+                        {% set count_color = "rgb(255, 160, 160)" %}
+                    {% else %}
+                        {% set count_color = "rgb(255, 255, 255)" %}
+                    {% endif %}
+                    <span style=" 
+                            color: #222; 
+                            padding: 0px 1px 0px 2px;
+                            border-radius: 3px;
+                            text-align: center;
+                            background-color:{{ count_color }}; 
+                            font-weight: bold;">
+                        {{ tagcount }}
+                    </span>
+                </a>
             {% endfor %}
             <br />
         {% endfor %}

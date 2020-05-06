@@ -31,10 +31,13 @@ def home():
 @app.route("/gallery")
 def gallery():
     books = galleryDB.get_all_books()
+    tagdict = galleryDB.get_all_tags()
+    maxcount = max([b for value in tagdict.values() for a, b in value])
     return render_template("gallery.html", 
                            title="Gallery", 
                            books=books, 
-                           tags=galleryDB.get_all_tags(),
+                           tags=tagdict,
+                           maxcount=maxcount,
                            allbooks=True,
                            read=False
                         )
@@ -43,10 +46,13 @@ def gallery():
 @app.route("/gallery-read")
 def gallery_read():
     books = galleryDB.get_read_books()
+    tagdict = galleryDB.get_all_tags(books)
+    maxcount = max(tagdict, key=lambda c: c[1])
     return render_template("gallery.html", 
                            title="Gallery", 
                            books=books, 
-                           tags=galleryDB.get_all_tags(books),
+                           tags=tagdict,
+                           maxcount=maxcount,
                            allbooks=False,
                            read=True
                         )
@@ -55,10 +61,13 @@ def gallery_read():
 @app.route("/gallery-unread")
 def gallery_unread():
     books = galleryDB.get_unread_books()
+    tagdict = galleryDB.get_all_tags(books)
+    maxcount = max(tagdict, key=lambda c: c[1])
     return render_template("gallery.html", 
                            title="Gallery", 
                            books=books, 
-                           tags=galleryDB.get_all_tags(books),
+                           tags=tagdict,
+                           maxcount=maxcount,
                            allbooks=False,
                            read=False
                         )
@@ -71,10 +80,13 @@ def tagged_gallery(tag, allbooks, read):
         books = galleryDB.get_books_bytag(tag)
     else:
         books = galleryDB.get_books_bytag(tag, bool(read))
+    tagdict = galleryDB.get_all_tags()
+    maxcount = max(tagdict, key=lambda c: c[1])
     return render_template("gallery.html", 
                            title="Gallery", 
                            books=books, 
-                           tags=galleryDB.get_all_tags(),
+                           tags=tagdict,
+                           maxcount=maxcount,
                            allbooks=allbooks,
                            read=read
                         )
