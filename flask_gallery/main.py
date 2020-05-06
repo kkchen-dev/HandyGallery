@@ -12,8 +12,8 @@ from db_handler import GalleryDB
 # Run this before starting the main.py program.
 # <directory to mongodb>/mongodb/bin/mongod --config <directory to mongodb>/mongodb/mongod.conf --fork
 
-port = 9937
-portdb = 27127
+port = 12345
+portdb = 23456
 
 
 app = Flask(__name__)

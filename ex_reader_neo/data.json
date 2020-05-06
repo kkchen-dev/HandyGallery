@@ -1,0 +1,15 @@
+{
+    "settings": "~/Tools/NeoAutoExSettings.json",
+    "process_bar": "~/Tools/process_bar/",
+    "site_string": "",
+    "download_path": "~/Downloads/",
+    "output_path": "~/TEMP/",
+    "title_start": "id=\"gj\">",
+    "title_start_eng": "id=\"gn\">",
+    "taglist_start": "<div id=\"taglist\">",
+    "taglist_end": "<div id=\"tagmenu_new\"",
+    "img_container_start": "id=\"gdt\"",
+    "img_container_end": "class=\"gtb\"",
+    "title_end": "</h1>",
+    "output_file_type": ".html"
+}
