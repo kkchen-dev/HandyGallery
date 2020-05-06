@@ -32,7 +32,8 @@ def home():
 def gallery():
     books = galleryDB.get_all_books()
     tagdict = galleryDB.get_all_tags()
-    maxcount = max([b for value in tagdict.values() for a, b in value])
+    valcounts = [b for value in tagdict.values() for a, b in value]
+    maxcount = max(valcounts) if len(valcounts) else 1
     return render_template("gallery.html", 
                            title="Gallery", 
                            books=books, 
@@ -47,7 +48,8 @@ def gallery():
 def gallery_read():
     books = galleryDB.get_read_books()
     tagdict = galleryDB.get_all_tags(books)
-    maxcount = max(tagdict, key=lambda c: c[1])
+    valcounts = [b for value in tagdict.values() for a, b in value]
+    maxcount = max(valcounts) if len(valcounts) else 1
     return render_template("gallery.html", 
                            title="Gallery", 
                            books=books, 
@@ -62,7 +64,8 @@ def gallery_read():
 def gallery_unread():
     books = galleryDB.get_unread_books()
     tagdict = galleryDB.get_all_tags(books)
-    maxcount = max(tagdict, key=lambda c: c[1])
+    valcounts = [b for value in tagdict.values() for a, b in value]
+    maxcount = max(valcounts) if len(valcounts) else 1
     return render_template("gallery.html", 
                            title="Gallery", 
                            books=books, 
@@ -81,7 +84,8 @@ def tagged_gallery(tag, allbooks, read):
     else:
         books = galleryDB.get_books_bytag(tag, bool(read))
     tagdict = galleryDB.get_all_tags()
-    maxcount = max(tagdict, key=lambda c: c[1])
+    valcounts = [b for value in tagdict.values() for a, b in value]
+    maxcount = max(valcounts) if len(valcounts) else 1
     return render_template("gallery.html", 
                            title="Gallery", 
                            books=books, 
