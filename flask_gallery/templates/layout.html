@@ -29,8 +29,8 @@
               <div class="navbar-nav mr-auto">
                 <!-- <a class="nav-item nav-link" href="/">Home</a> -->
                 <a class="nav-item nav-link" href="{{ url_for('gallery') }}">All</a>
-                <a class="nav-item nav-link" href="{{ url_for('gallery_read') }}">Read</a>
-                <a class="nav-item nav-link" href="{{ url_for('gallery_unread') }}">Unread</a>
+                <a class="nav-item nav-link" href="{{ url_for('render_gallery', tag='None', allbooks=0, read=1) }}">Read</a>
+                <a class="nav-item nav-link" href="{{ url_for('render_gallery', tag='None', allbooks=0, read=0) }}">Unread</a>
               </div>
               <!-- Navbar Right Side -->
               <!-- <div class="navbar-nav">

@@ -28,6 +28,10 @@ class GalleryDB:
         return self.db["book_collection"].find_one({"_id": book_id})
 
 
+    def get_books_by_wether_read(self, read):
+        return self.get_read_books() if read else self.get_unread_books()
+
+
     def get_unread_books(self):
         return [book for book in self.db["book_collection"].find({"read": False})]
 

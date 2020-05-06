@@ -25,65 +25,38 @@ galleryDB = GalleryDB(host="localhost", port=portdb)
 @app.route("/")
 @app.route("/home")
 def home():
-    return render_template("home.html", title="Home Page")
+    books = galleryDB.get_all_books()
+    unread_books = galleryDB.get_books_by_wether_read(read=False)
+    random.shuffle(unread_books)
+    return render_template("home.html", 
+                           title="Home Page",
+                           books=unread_books[:5], 
+                           total_length=len(books),
+                           unread_length=len(unread_books),
+                           allbooks=True,
+                           read=False
+                          )
 
 
 @app.route("/gallery")
 def gallery():
-    books = galleryDB.get_all_books()
-    tagdict = galleryDB.get_all_tags()
-    valcounts = [b for value in tagdict.values() for a, b in value]
-    maxcount = max(valcounts) if len(valcounts) else 1
-    return render_template("gallery.html", 
-                           title="Gallery", 
-                           books=books, 
-                           tags=tagdict,
-                           maxcount=maxcount,
-                           allbooks=True,
-                           read=False
-                        )
+    return render_gallery("None", 1, 0)
 
 
-@app.route("/gallery-read")
-def gallery_read():
-    books = galleryDB.get_read_books()
-    tagdict = galleryDB.get_all_tags(books)
-    valcounts = [b for value in tagdict.values() for a, b in value]
-    maxcount = max(valcounts) if len(valcounts) else 1
-    return render_template("gallery.html", 
-                           title="Gallery", 
-                           books=books, 
-                           tags=tagdict,
-                           maxcount=maxcount,
-                           allbooks=False,
-                           read=True
-                        )
-
-
-@app.route("/gallery-unread")
-def gallery_unread():
-    books = galleryDB.get_unread_books()
-    tagdict = galleryDB.get_all_tags(books)
-    valcounts = [b for value in tagdict.values() for a, b in value]
-    maxcount = max(valcounts) if len(valcounts) else 1
-    return render_template("gallery.html", 
-                           title="Gallery", 
-                           books=books, 
-                           tags=tagdict,
-                           maxcount=maxcount,
-                           allbooks=False,
-                           read=False
-                        )
-
-
-@app.route("/gallery-<string:tag>/<int:allbooks><int:read>")
-def tagged_gallery(tag, allbooks, read):
-    # print(f"{tag=}, {allbooks=}, {read=}")
-    if allbooks:
-        books = galleryDB.get_books_bytag(tag)
+@app.route("/gallery/<int:allbooks>.<int:read>.<string:tag>")
+def render_gallery(tag, allbooks, read):
+    if tag == "None":
+        if allbooks:
+            books = galleryDB.get_all_books()
+        else:
+            books = galleryDB.get_books_by_wether_read(read=read)
     else:
-        books = galleryDB.get_books_bytag(tag, bool(read))
-    tagdict = galleryDB.get_all_tags()
+        if allbooks:
+            books = galleryDB.get_books_bytag(tag)
+        else:
+            books = galleryDB.get_books_bytag(tag, bool(read))
+    
+    tagdict = galleryDB.get_all_tags(books)
     valcounts = [b for value in tagdict.values() for a, b in value]
     maxcount = max(valcounts) if len(valcounts) else 1
     return render_template("gallery.html", 
