@@ -1,8 +1,9 @@
 from datetime import datetime
 import secrets
+import random
 
 from flask import Flask, render_template, url_for, make_response
-from forms import ToggleRead
+from forms import ToggleRead, SearchForm
 from bson.objectid import ObjectId
 
 from db_handler import GalleryDB
@@ -69,6 +70,50 @@ def render_gallery(tag, allbooks, read):
                         )
 
 
+def build_key_phraseset(phrase):
+    symbol_set = {"[", "]", "(", ")", ",", 
+                  "?", ";", "{", "}", "-", 
+                  "!", "@", "*", "$", "&", 
+                  ":", "'", "\"", ".", "=", 
+                  "<", ">", "/", "\\", "|",
+                  "+", "`"," "}
+    phraseset, curr_chars = set(), []
+    for c in phrase:
+        if curr_chars and c in symbol_set:
+            phraseset.add("".join(curr_chars))
+            curr_chars = []
+        elif c not in symbol_set:
+            curr_chars.append(c)
+    if curr_chars:
+        phraseset.add("".join(curr_chars))
+    return phraseset
+
+
+def title_found(book_title, search_phrases):
+    if not search_phrases:
+        return False
+    title_phrases = build_key_phraseset(book_title)
+    return not bool(search_phrases - title_phrases)
+
+
+@app.route("/search", methods=["GET", "POST"])
+def search_title():
+    all_books = galleryDB.get_all_books()
+    books = []
+    form = SearchForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        for book in all_books:
+            if title_found(book["title"], build_key_phraseset(form.key_phrases.data)):
+                books.append(book)
+    # if form.errors:
+    #     flash(form.errors, "danger")
+    return render_template("search.html",
+                            title="Book",
+                            books=books,
+                            form=form
+                          )
+
+
 @app.route("/book-<string:book_id>", methods=["GET", "POST"])
 def bookpage(book_id):
     book = galleryDB.get_book_byid(ObjectId(book_id))
@@ -77,7 +122,8 @@ def bookpage(book_id):
     if form.validate_on_submit():
         galleryDB.update_read(book, read)
         read = not read
-    # print(form.errors)
+    # if form.errors:
+    #     flash(form.errors, "danger")
     return render_template("book.html",
                             title="Book",
                             imgs=book["contents"],

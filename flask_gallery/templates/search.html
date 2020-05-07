@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block style %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='gallery.css') }}">
+{% endblock style %}
+{% block content %}
+    <div class="content-section row justify-content-center">
+        <div class="col-9">
+            <form method="POST" action="">
+                <div class="row align-items-center">
+                    <div class="col-2" style="font-size: 19px;">
+                        Search Title
+                    </div>
+                    {{ form.key_phrases(class="col-7 form-control form-control-sm") }}
+                    {{ form.submit(class="btn btn-light btn-sm col-2", style="margin-left:20px;") }}
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="bookshelf" class="content-section row row-cols-3 row-cols-lg-5">
+        {% for book in books[::-1] %}
+            <div class="book_covers">
+                <div class="book_titles">
+                    <a href="{{ url_for('bookpage', book_id=book['_id'], contents=book['contents']) }}">
+                        {{ book["title"] }}
+                    </a>
+                </div>
+                <div class="book_thumbnails">
+                    <a href="{{ url_for('bookpage', book_id=book['_id'], contents=book['contents']) }}">
+                        <img class="thumbnails" src="{{ url_for('get_image', pid=book['thumbnail']) }}" alt="thumbnail">
+                    </a>
+                </div>
+                <div class="book_cover_footers">
+                    <div class="row justify-content-between">
+                        <div class="col-8">{{ book["date_added"] }}</div><div class="col-4">{{ book["contents"] | length }} pages</div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock content %}
