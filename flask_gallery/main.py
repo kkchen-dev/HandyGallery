@@ -1,8 +1,7 @@
-from datetime import datetime
 import secrets
 import random
 
-from flask import Flask, render_template, url_for, make_response
+from flask import Flask, render_template, flash, url_for, make_response
 from forms import ToggleRead, SearchForm
 from bson.objectid import ObjectId
 
@@ -14,13 +13,14 @@ from db_handler import GalleryDB
 # <directory to mongodb>/mongodb/bin/mongod --config <directory to mongodb>/mongodb/mongod.conf --fork
 
 port = 12345
+hostdb="localhost"
 portdb = 23456
 
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = secrets.token_hex(16)
 
-galleryDB = GalleryDB(host="localhost", port=portdb)
+galleryDB = GalleryDB(host=hostdb, port=portdb)
 
 
 @app.route("/")
@@ -39,13 +39,13 @@ def home():
                           )
 
 
-@app.route("/gallery")
+@app.route("/gallery", methods=["GET", "POST"])
 def gallery():
-    return render_gallery("None", 1, 0)
+    return render_gallery(1, "None", 1, 0)
 
 
-@app.route("/gallery/<int:allbooks>.<int:read>.<string:tag>")
-def render_gallery(tag, allbooks, read):
+@app.route("/gallery/p<int:page>.<int:allbooks>.<int:read>.<string:tag>", methods=["GET", "POST"])
+def render_gallery(page, tag, allbooks, read):
     if tag == "None":
         if allbooks:
             books = galleryDB.get_all_books()
@@ -60,8 +60,15 @@ def render_gallery(tag, allbooks, read):
     tagdict = galleryDB.get_all_tags(books)
     valcounts = [b for value in tagdict.values() for a, b in value]
     maxcount = max(valcounts) if len(valcounts) else 1
+    total_pages = (len(books) - 1) // 25 + 1 if len(books) else 1
+    if 0 <= (page - 1) * 25 < len(books):
+        books = books[-1-(page-1)*25:-1-page*25:-1]
+    else:
+        books = []
     return render_template("gallery.html", 
                            title="Gallery", 
+                           page=page, 
+                           total_pages=total_pages,
                            books=books, 
                            tags=tagdict,
                            maxcount=maxcount,

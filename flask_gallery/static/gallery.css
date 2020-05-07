@@ -3,10 +3,31 @@
     padding: 0px 5px 5px 5px;
 }
 
+.page_button_bars {
+    background-color: #333;
+    font-size: 11pt;
+}
+
+.page_buttons, .page_buttons:hover {
+    color: #ddd;
+    padding: 3px 10px 3px 10px;
+    text-decoration-line: none;
+}
+
+.page_buttons:hover {
+    background-color: #666;
+}
+
+.pbb_table {
+    padding: 0px;
+    border: 1px solid #999;
+}
+
 #bookshelf {
     background: #333;
     border: 1px solid #999;
     padding: 0px;
+    margin: 0px;
 }
 
 .book_covers {
@@ -38,7 +59,7 @@
     max-height: 255px;
 }
 
-.added_dates {
+.book_cover_footers {
     position: relative;
     bottom: 0px;
 }
