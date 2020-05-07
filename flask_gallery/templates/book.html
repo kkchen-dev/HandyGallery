@@ -7,7 +7,7 @@
         {% for key in tags %}
             <span class="tag_type"> {{ key }} </span>
             {% for tag in tags[key] %}
-                <a class="tags" href="{{ url_for('render_gallery', tag=key+tag, allbooks=True, read=False) }}">{{ tag }}</a>
+                <a class="tags" href="{{ url_for('render_gallery', page=1, tag=key+tag, allbooks=True, read=False) }}">{{ tag }}</a>
             {% endfor %}
             <br />
         {% endfor %}
