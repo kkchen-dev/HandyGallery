@@ -150,5 +150,5 @@ def get_image(pid):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=port)
-    # app.run(port=port)
+    # app.run(debug=True, port=port)
+    app.run(port=port)
