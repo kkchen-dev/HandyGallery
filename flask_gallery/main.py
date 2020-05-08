@@ -11,15 +11,16 @@ from db_handler import GalleryDB
 # Run this before starting the main.py program.
 # <directory to mongodb>/mongodb/bin/mongod --config <directory to mongodb>/mongodb/mongod.conf --fork
 
-port = 12345
-hostdb="localhost"
-portdb = 23456
+db_host="localhost"
+db_port = 23456
+flask_port = 12345
+debug=False
 
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = secrets.token_hex(16)
 
-galleryDB = GalleryDB(host=hostdb, port=portdb)
+galleryDB = GalleryDB(host=db_host, port=db_port)
 
 
 @app.route("/")
@@ -163,5 +164,4 @@ def get_image(pid):
 
 
 if __name__ == "__main__":
-    # app.run(debug=True, port=port)
-    app.run(port=port)
+    app.run(debug=debug, port=flask_port)
