@@ -43,15 +43,4 @@
             </div>
         </form>
     </div>
-    <div class="button-container row justify-content-center" style="margin: 10px 0px 10px 0px;">
-        <form method="POST" action="">
-            <div class="col" style="text-align: center;">
-                {{ book_deletion_form.confirm() }}
-                {{ book_deletion_form.confirm.label(class="form-check-label") }}
-            </div>
-            <div>
-                {{ book_deletion_form.submit(class="btn btn-danger btn-lg") }}
-            </div>
-        </form>
-    </div>
 {% endblock content %}

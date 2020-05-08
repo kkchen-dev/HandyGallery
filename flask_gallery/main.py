@@ -3,6 +3,7 @@ import random
 
 from flask import Flask, render_template, redirect, flash, url_for, make_response
 from forms import SearchForm, BookDeletion
+
 from db_handler import GalleryDB
 
 # WARNING!!!! THIS IS ONLY FOR DEVELOPMENT!!!!
@@ -55,6 +56,7 @@ def render_gallery(page, tag, allbooks, read):
         else:
             books = galleryDB.get_books_bytag(tag, bool(read))
     
+    tagdict = galleryDB.get_all_tags(books)
     valcounts = sorted([b for value in tagdict.values() for a, b in value])
     maxcounts = [1, 1, 1, 1]
     maxcounts_length = len(maxcounts)
@@ -140,8 +142,7 @@ def bookpage(book_id):
                             imgs=book["contents"],
                             tags=book["tags"],
                             read=read,
-                            form=form,
-                            book_deletion_form=book_deletion_form
+                            form=form
                           )
 
 @app.route("/book-<string:book_id>/toggle", methods=["GET", "POST"])
