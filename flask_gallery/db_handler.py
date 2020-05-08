@@ -25,7 +25,7 @@ class GalleryDB:
 
 
     def get_book_byid(self, book_id):
-        return self.db["book_collection"].find_one({"_id": book_id})
+        return self.db["book_collection"].find_one({"_id": ObjectId(book_id)})
 
 
     def get_books_by_wether_read(self, read):
@@ -47,6 +47,11 @@ class GalleryDB:
             if book["read"] == read or read is None:
                 books.append(self.db["book_collection"].find_one(ObjectId(item["book_id"])))
         return books
+
+
+    def delete_book(self, book_id):
+        self.db["book_collection"].delete_one({"_id": ObjectId(book_id)})
+        self.db["tag_collection"].delete_many({"book_id": book_id})
 
 
     def get_img(self, content_id):
@@ -79,6 +84,18 @@ class GalleryDB:
 
 
     def update_read(self, book, read):
+        self.db["book_collection"].update_one(
+            book, 
+            {
+                "$set": 
+                {
+                    "read": not read
+                }
+            }
+        )
+
+
+    def toggle_read(self, book, read):
         self.db["book_collection"].update_one(
             book, 
             {

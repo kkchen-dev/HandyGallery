@@ -29,14 +29,13 @@
               <div class="navbar-nav mr-auto">
                 <!-- <a class="nav-item nav-link" href="/">Home</a> -->
                 <a class="nav-item nav-link" href="{{ url_for('gallery') }}">All</a>
-                <a class="nav-item nav-link" href="{{ url_for('render_gallery', tag='None', allbooks=0, read=1) }}">Read</a>
-                <a class="nav-item nav-link" href="{{ url_for('render_gallery', tag='None', allbooks=0, read=0) }}">Unread</a>
+                <a class="nav-item nav-link" href="{{ url_for('render_gallery', page=1, tag='None', allbooks=0, read=1) }}">Read</a>
+                <a class="nav-item nav-link" href="{{ url_for('render_gallery', page=1, tag='None', allbooks=0, read=0) }}">Unread</a>
               </div>
               <!-- Navbar Right Side -->
-              <!-- <div class="navbar-nav">
-                <a class="nav-item nav-link" href="/">Login</a>
-                <a class="nav-item nav-link" href="/">Register</a>
-              </div> -->
+              <div class="navbar-nav">
+                <a class="nav-item nav-link" href="{{ url_for('search_title', page=1) }}">Search Title</a>
+              </div>
             </div>
           </div>
         </nav>

@@ -1,9 +1,8 @@
-from datetime import datetime
 import secrets
+import random
 
-from flask import Flask, render_template, url_for, make_response
-from forms import ToggleRead
-from bson.objectid import ObjectId
+from flask import Flask, render_template, redirect, flash, url_for, make_response
+from forms import SearchForm, BookDeletion
 
 from db_handler import GalleryDB
 
@@ -13,13 +12,14 @@ from db_handler import GalleryDB
 # <directory to mongodb>/mongodb/bin/mongod --config <directory to mongodb>/mongodb/mongod.conf --fork
 
 port = 12345
+hostdb="localhost"
 portdb = 23456
 
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = secrets.token_hex(16)
 
-galleryDB = GalleryDB(host="localhost", port=portdb)
+galleryDB = GalleryDB(host=hostdb, port=portdb)
 
 
 @app.route("/")
@@ -38,13 +38,13 @@ def home():
                           )
 
 
-@app.route("/gallery")
+@app.route("/gallery", methods=["GET", "POST"])
 def gallery():
-    return render_gallery("None", 1, 0)
+    return render_gallery(1, "None", 1, 0)
 
 
-@app.route("/gallery/<int:allbooks>.<int:read>.<string:tag>")
-def render_gallery(tag, allbooks, read):
+@app.route("/gallery/p<int:page>.<int:allbooks>.<int:read>.<string:tag>", methods=["GET", "POST"])
+def render_gallery(page, tag, allbooks, read):
     if tag == "None":
         if allbooks:
             books = galleryDB.get_all_books()
@@ -57,34 +57,100 @@ def render_gallery(tag, allbooks, read):
             books = galleryDB.get_books_bytag(tag, bool(read))
     
     tagdict = galleryDB.get_all_tags(books)
-    valcounts = [b for value in tagdict.values() for a, b in value]
-    maxcount = max(valcounts) if len(valcounts) else 1
+    valcounts = sorted([b for value in tagdict.values() for a, b in value])
+    maxcounts = [1, 1, 1, 1]
+    maxcounts_length = len(maxcounts)
+    valcounts_length = len(valcounts)
+    if valcounts_length:
+        for i in range(maxcounts_length):
+            maxcounts[i] = valcounts[-1] * (i+1) // maxcounts_length
+    total_pages = (len(books) - 1) // 25 + 1 if len(books) else 1
+    if 0 <= (page - 1) * 25 < len(books):
+        books = books[-1-(page-1)*25:-1-page*25:-1]
+    else:
+        books = []
     return render_template("gallery.html", 
                            title="Gallery", 
+                           page=page, 
+                           total_pages=total_pages,
                            books=books, 
                            tags=tagdict,
-                           maxcount=maxcount,
+                           maxcounts=maxcounts,
                            allbooks=allbooks,
                            read=read
                         )
 
 
+def build_key_phraseset(phrase):
+    symbol_set = {"[", "]", "(", ")", ",", 
+                  "?", ";", "{", "}", "-", 
+                  "!", "@", "*", "$", "&", 
+                  ":", "'", "\"", ".", "=", 
+                  "<", ">", "/", "\\", "|",
+                  "+", "`"," "}
+    phraseset, curr_chars = set(), []
+    for c in phrase:
+        if curr_chars and c in symbol_set:
+            phraseset.add("".join(curr_chars))
+            curr_chars = []
+        elif c not in symbol_set:
+            curr_chars.append(c)
+    if curr_chars:
+        phraseset.add("".join(curr_chars))
+    return phraseset
+
+
+def title_found(book_title, search_phrases):
+    if not search_phrases:
+        return False
+    title_phrases = build_key_phraseset(book_title)
+    return not bool(search_phrases - title_phrases)
+
+
+@app.route("/search", methods=["GET", "POST"])
+def search_title():
+    all_books = galleryDB.get_all_books()
+    books = []
+    form = SearchForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        for book in all_books:
+            if title_found(book["title"], build_key_phraseset(form.key_phrases.data)):
+                books.append(book)
+    # if form.errors:
+    #     flash(form.errors, "danger")
+    return render_template("search.html",
+                            title="Book",
+                            books=books,
+                            form=form
+                          )
+
+
 @app.route("/book-<string:book_id>", methods=["GET", "POST"])
 def bookpage(book_id):
-    book = galleryDB.get_book_byid(ObjectId(book_id))
-    form = ToggleRead(csrf_enabled=False)
+    book = galleryDB.get_book_byid(book_id)
     read = book["read"]
+    form = BookDeletion(csrf_enabled=False)
     if form.validate_on_submit():
-        galleryDB.update_read(book, read)
-        read = not read
-    # print(form.errors)
+        if form.confirm.data:
+            galleryDB.delete_book(book_id)
+            flash("Book Deleted", "success")
+            return redirect(url_for("home"))
+        flash("Book Not Deleted: Please confirm the deletion.", "danger")
     return render_template("book.html",
                             title="Book",
+                            book_id=book_id,
                             imgs=book["contents"],
                             tags=book["tags"],
                             read=read,
                             form=form
                           )
+
+@app.route("/book-<string:book_id>/toggle", methods=["GET", "POST"])
+def bookpage_toggle_read(book_id):
+    book = galleryDB.get_book_byid(book_id)
+    read = book["read"]
+    galleryDB.toggle_read(book, read)
+    return redirect(url_for("bookpage", book_id=book_id))
 
 
 @app.route('/images/<string:pid>.jpg')

@@ -23,19 +23,19 @@
             <span style="font-size: 10px;">{{ tagtype }}:</span>
             {% for tag, tagcount in tags[tagtype] %}
                 <a class="tags" href="{{ url_for('render_gallery', 
+                                                 page=1, 
                                                  tag=tagtype+':'+tag, 
                                                  allbooks=allbooks, 
                                                  read=read) }}">
                     {{ tag }}
-                    {% set percent = tagcount / maxcount %}
                     {% set count_color = "rgb(160, 160, 255)" %}
-                    {% if percent < 0.25 %}
+                    {% if tagcount < maxcounts[0] %}
                         {% set count_color = "rgb(160, 255, 160)" %}
-                    {% elif 0.25 <= percent < 0.5 %}
+                    {% elif maxcounts[0] <= tagcount < maxcounts[1] %}
                         {% set count_color = "rgb(225, 255, 160)" %}
-                    {% elif 0.5 <= percent < 0.75 %}
+                    {% elif maxcounts[1] <= tagcount < maxcounts[2] %}
                         {% set count_color = "rgb(255, 225, 160)" %}
-                    {% elif 0.75 <= percent < 1 %}
+                    {% elif maxcounts[2] <= tagcount < maxcounts[3] %}
                         {% set count_color = "rgb(255, 160, 160)" %}
                     {% else %}
                         {% set count_color = "rgb(255, 255, 255)" %}
@@ -54,16 +54,62 @@
             <br />
         {% endfor %}
     </div>
+    
+    <div class="row justify-content-center" style="margin-top: 15px;">
+        <div>
+            <table class="page_button_bars pbb_table">
+                <tr class="pbb_table">
+                    {% if page > 1 %}
+                        {% set prev_href = url_for('render_gallery', page=page-1, tag='None', allbooks=allbooks, read=read) %}
+                        {% set lbutton = "background-color: initial;" %}
+                    {% else %}
+                        {% set prev_href = "#" %}
+                        {% set lbutton = "background-color: #666;" %}
+                    {% endif %}
+                    {% if page < total_pages %}
+                        {% set next_href = url_for('render_gallery', page=page+1, tag='None', allbooks=allbooks, read=read) %}
+                        {% set rbutton = "background-color: initial;" %}
+                    {% else %}
+                        {% set next_href = "#" %}
+                        {% set rbutton = "background-color: #666;" %}
+                    {% endif %}
+                    <td class="pbb_table" style="{{ lbutton }}"><a class="page_buttons" href="{{ prev_href }}">&lt;</a></td>
+                    <td class="pbb_table" style="{{ lbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=1, tag='None', allbooks=allbooks, read=read) }}">1</a></td>
+                    {% if page > 6 %}
+                    <td class="pbb_table" style="padding: 0px 5px 0px 5px;"> . . . </td>
+                    {% endif %}
+                    {% for pb in range(page-4, page+5) %}
+                        {% if 1 < pb < total_pages %}
+                            {% if pb == page %}
+                                {% set cbutton = "background-color: #666;" %}
+                            {% else %}
+                                {% set cbutton = "background-color: initial;" %}
+                            {% endif %}
+                            <td class="pbb_table" style="{{ cbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=pb, tag='None', allbooks=allbooks, read=read) }}">{{ pb }}</a></td>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page < total_pages - 5 %}
+                    <td class="pbb_table" style="padding: 0px 5px 0px 5px;"> . . . </td>
+                    {% endif %}
+                    {% if total_pages > 1 %}
+                        <td class="pbb_table" style="{{ rbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=total_pages, tag='None', allbooks=allbooks, read=read) }}">{{ total_pages }}</a></td>
+                    {% endif %}
+                    <td class="pbb_table" style="{{ rbutton }}"><a class="page_buttons" href="{{ next_href }}">&gt;</a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
     <div id="bookshelf" class="content-section row row-cols-3 row-cols-lg-5">
-        {% for book in books[::-1] %}
+        {% for book in books %}
             <div class="book_covers">
                 <div class="book_titles">
-                    <a href="{{ url_for('bookpage', book_id=book['_id'], contents=book['contents']) }}">
+                    <a href="{{ url_for('bookpage', book_id=book['_id']) }}">
                         {{ book["title"] }}
                     </a>
                 </div>
                 <div class="book_thumbnails">
-                    <a href="{{ url_for('bookpage', book_id=book['_id'], contents=book['contents']) }}">
+                    <a href="{{ url_for('bookpage', book_id=book['_id']) }}">
                         <img class="thumbnails" src="{{ url_for('get_image', pid=book['thumbnail']) }}" alt="thumbnail">
                     </a>
                 </div>
@@ -74,5 +120,36 @@
                 </div>
             </div>
         {% endfor %}
+    </div>
+    
+    <div class="row justify-content-center" style="margin-bottom: 15px;">
+        <div>
+            <table class="page_button_bars pbb_table">
+                <tr class="pbb_table">
+                    <td class="pbb_table" style="{{ lbutton }}"><a class="page_buttons" href="{{ prev_href }}">&lt;</a></td>
+                    <td class="pbb_table" style="{{ lbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=1, tag='None', allbooks=allbooks, read=read) }}">1</a></td>
+                    {% if page > 6 %}
+                    <td class="pbb_table" style="padding: 0px 5px 0px 5px;"> . . . </td>
+                    {% endif %}
+                    {% for pb in range(page-4, page+5) %}
+                        {% if 1 < pb < total_pages %}
+                            {% if pb == page %}
+                                {% set cbutton = "background-color: #666;" %}
+                            {% else %}
+                                {% set cbutton = "background-color: initial;" %}
+                            {% endif %}
+                            <td class="pbb_table" style="{{ cbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=pb, tag='None', allbooks=allbooks, read=read) }}">{{ pb }}</a></td>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page < total_pages - 5 %}
+                    <td class="pbb_table" style="padding: 0px 5px 0px 5px;"> . . . </td>
+                    {% endif %}
+                    {% if total_pages > 1 %}
+                        <td class="pbb_table" style="{{ rbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=total_pages, tag='None', allbooks=allbooks, read=read) }}">{{ total_pages }}</a></td>
+                    {% endif %}
+                    <td class="pbb_table" style="{{ rbutton }}"><a class="page_buttons" href="{{ next_href }}">&gt;</a></td>
+                </tr>
+            </table>
+        </div>
     </div>
 {% endblock content %}
