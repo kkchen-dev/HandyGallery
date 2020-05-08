@@ -93,3 +93,15 @@ class GalleryDB:
                 }
             }
         )
+
+
+    def toggle_read(self, book, read):
+        self.db["book_collection"].update_one(
+            book, 
+            {
+                "$set": 
+                {
+                    "read": not read
+                }
+            }
+        )

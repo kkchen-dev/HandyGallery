@@ -28,15 +28,14 @@
                                                  allbooks=allbooks, 
                                                  read=read) }}">
                     {{ tag }}
-                    {% set percent = tagcount / maxcount %}
                     {% set count_color = "rgb(160, 160, 255)" %}
-                    {% if percent < 0.25 %}
+                    {% if tagcount < maxcounts[0] %}
                         {% set count_color = "rgb(160, 255, 160)" %}
-                    {% elif 0.25 <= percent < 0.5 %}
+                    {% elif maxcounts[0] <= tagcount < maxcounts[1] %}
                         {% set count_color = "rgb(225, 255, 160)" %}
-                    {% elif 0.5 <= percent < 0.75 %}
+                    {% elif maxcounts[1] <= tagcount < maxcounts[2] %}
                         {% set count_color = "rgb(255, 225, 160)" %}
-                    {% elif 0.75 <= percent < 1 %}
+                    {% elif maxcounts[2] <= tagcount < maxcounts[3] %}
                         {% set count_color = "rgb(255, 160, 160)" %}
                     {% else %}
                         {% set count_color = "rgb(255, 255, 255)" %}
@@ -105,12 +104,12 @@
         {% for book in books %}
             <div class="book_covers">
                 <div class="book_titles">
-                    <a href="{{ url_for('bookpage', book_id=book['_id'], contents=book['contents']) }}">
+                    <a href="{{ url_for('bookpage', book_id=book['_id']) }}">
                         {{ book["title"] }}
                     </a>
                 </div>
                 <div class="book_thumbnails">
-                    <a href="{{ url_for('bookpage', book_id=book['_id'], contents=book['contents']) }}">
+                    <a href="{{ url_for('bookpage', book_id=book['_id']) }}">
                         <img class="thumbnails" src="{{ url_for('get_image', pid=book['thumbnail']) }}" alt="thumbnail">
                     </a>
                 </div>

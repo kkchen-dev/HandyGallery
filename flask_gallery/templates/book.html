@@ -26,12 +26,21 @@
         {% endfor %}
     </div>
     <div class="button-container row justify-content-center" style="margin: 10px 0px 10px 0px;">
+        {% if read %}
+            <a href="{{ url_for('bookpage_toggle_read', book_id=book_id) }}" class="btn btn-danger btn-lg">Set Unread</a>
+        {% else %}
+            <a href="{{ url_for('bookpage_toggle_read', book_id=book_id) }}" class="btn btn-success btn-lg">Set Read</a>
+        {% endif %}
+    </div>
+    <div class="button-container row justify-content-center" style="margin: 10px 0px 10px 0px;">
         <form method="POST" action="">
-            {% if read %}
-                {{ form.submit(class="btn btn-danger btn-lg", value="Set Unread") }}
-            {% else %}
-                {{ form.submit(class="btn btn-success btn-lg", value="Set Read") }}
-            {% endif %}
+            <div class="col" style="text-align: center;">
+                {{ form.confirm() }}
+                {{ form.confirm.label(class="form-check-label") }}
+            </div>
+            <div>
+                {{ form.submit(class="btn btn-danger btn-lg") }}
+            </div>
         </form>
     </div>
     <div class="button-container row justify-content-center" style="margin: 10px 0px 10px 0px;">

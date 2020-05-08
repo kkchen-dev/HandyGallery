@@ -2,8 +2,7 @@ import secrets
 import random
 
 from flask import Flask, render_template, redirect, flash, url_for, make_response
-from forms import ToggleRead, SearchForm, BookDeletion
-
+from forms import SearchForm, BookDeletion
 from db_handler import GalleryDB
 
 # WARNING!!!! THIS IS ONLY FOR DEVELOPMENT!!!!
@@ -56,9 +55,13 @@ def render_gallery(page, tag, allbooks, read):
         else:
             books = galleryDB.get_books_bytag(tag, bool(read))
     
-    tagdict = galleryDB.get_all_tags(books)
-    valcounts = [b for value in tagdict.values() for a, b in value]
-    maxcount = max(valcounts) if len(valcounts) else 1
+    valcounts = sorted([b for value in tagdict.values() for a, b in value])
+    maxcounts = [1, 1, 1, 1]
+    maxcounts_length = len(maxcounts)
+    valcounts_length = len(valcounts)
+    if valcounts_length:
+        for i in range(maxcounts_length):
+            maxcounts[i] = valcounts[-1] * (i+1) // maxcounts_length
     total_pages = (len(books) - 1) // 25 + 1 if len(books) else 1
     if 0 <= (page - 1) * 25 < len(books):
         books = books[-1-(page-1)*25:-1-page*25:-1]
@@ -70,7 +73,7 @@ def render_gallery(page, tag, allbooks, read):
                            total_pages=total_pages,
                            books=books, 
                            tags=tagdict,
-                           maxcount=maxcount,
+                           maxcounts=maxcounts,
                            allbooks=allbooks,
                            read=read
                         )
@@ -123,28 +126,30 @@ def search_title():
 @app.route("/book-<string:book_id>", methods=["GET", "POST"])
 def bookpage(book_id):
     book = galleryDB.get_book_byid(book_id)
-    form = ToggleRead(csrf_enabled=False)
-    book_deletion_form = BookDeletion(csrf_enabled=False)
     read = book["read"]
+    form = BookDeletion(csrf_enabled=False)
     if form.validate_on_submit():
-        galleryDB.update_read(book, read)
-        read = not read
-    # if form.errors:
-    #     flash(form.errors, "danger")
-    if book_deletion_form.validate_on_submit():
-        if book_deletion_form.confirm.data:
+        if form.confirm.data:
             galleryDB.delete_book(book_id)
             flash("Book Deleted", "success")
             return redirect(url_for("home"))
         flash("Book Not Deleted: Please confirm the deletion.", "danger")
     return render_template("book.html",
                             title="Book",
+                            book_id=book_id,
                             imgs=book["contents"],
                             tags=book["tags"],
                             read=read,
                             form=form,
                             book_deletion_form=book_deletion_form
                           )
+
+@app.route("/book-<string:book_id>/toggle", methods=["GET", "POST"])
+def bookpage_toggle_read(book_id):
+    book = galleryDB.get_book_byid(book_id)
+    read = book["read"]
+    galleryDB.toggle_read(book, read)
+    return redirect(url_for("bookpage", book_id=book_id))
 
 
 @app.route('/images/<string:pid>.jpg')
