@@ -1,9 +1,8 @@
 import secrets
 import random
 
-from flask import Flask, render_template, flash, url_for, make_response
-from forms import ToggleRead, SearchForm
-from bson.objectid import ObjectId
+from flask import Flask, render_template, redirect, flash, url_for, make_response
+from forms import ToggleRead, SearchForm, BookDeletion
 
 from db_handler import GalleryDB
 
@@ -123,20 +122,28 @@ def search_title():
 
 @app.route("/book-<string:book_id>", methods=["GET", "POST"])
 def bookpage(book_id):
-    book = galleryDB.get_book_byid(ObjectId(book_id))
+    book = galleryDB.get_book_byid(book_id)
     form = ToggleRead(csrf_enabled=False)
+    book_deletion_form = BookDeletion(csrf_enabled=False)
     read = book["read"]
     if form.validate_on_submit():
         galleryDB.update_read(book, read)
         read = not read
     # if form.errors:
     #     flash(form.errors, "danger")
+    if book_deletion_form.validate_on_submit():
+        if book_deletion_form.confirm.data:
+            galleryDB.delete_book(book_id)
+            flash("Book Deleted", "success")
+            return redirect(url_for("home"))
+        flash("Book Not Deleted: Please confirm the deletion.", "danger")
     return render_template("book.html",
                             title="Book",
                             imgs=book["contents"],
                             tags=book["tags"],
                             read=read,
-                            form=form
+                            form=form,
+                            book_deletion_form=book_deletion_form
                           )
 
 
