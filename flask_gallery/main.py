@@ -14,7 +14,7 @@ from db_handler import GalleryDB
 db_host="localhost"
 db_port = 23456
 flask_port = 12345
-debug=False
+debug = False
 
 
 app = Flask(__name__)
