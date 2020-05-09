@@ -39,17 +39,30 @@ class GalleryDB:
     def get_read_books(self):
         return [book for book in self.db["book_collection"].find({"read": True})]
 
-
-    def get_books_bytag(self, tag: str, read=None):
+    
+    def get_books_bytags(self, tags: list, read=None):
+        book_ids = set()
+        for tag in tags:
+            temp_ids = set()
+            for item in self.db["tag_collection"].find({"tag": tag}):
+                temp_ids.add(item["book_id"])
+            if not book_ids:
+                book_ids.update(temp_ids)
+            else:
+                book_ids &= temp_ids
+        
         books = []
-        for item in self.db["tag_collection"].find({"tag": tag}):
-            book = self.db["book_collection"].find_one(ObjectId(item["book_id"]))
+        for book_id in book_ids:
+            book = self.db["book_collection"].find_one(ObjectId(book_id))
             if book["read"] == read or read is None:
-                books.append(self.db["book_collection"].find_one(ObjectId(item["book_id"])))
+                books.append(self.db["book_collection"].find_one(ObjectId(book_id)))
         return books
 
 
     def delete_book(self, book_id):
+        book = self.db["book_collection"].find_one(ObjectId(book_id))
+        for page_id in book["contents"]:
+            self.fs.delete(ObjectId(page_id))
         self.db["book_collection"].delete_one({"_id": ObjectId(book_id)})
         self.db["tag_collection"].delete_many({"book_id": book_id})
 

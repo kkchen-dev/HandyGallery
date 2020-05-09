@@ -44,5 +44,3 @@ Requires the following libraries.
 ## Acknowledgments
 
 * [Billie Thompson](https://gist.github.com/PurpleBooth) provides [the template]((https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)) for this document.
-
-* [Corey Schafer](https://github.com/CoreyMSchafer) - This project follows [Corey Schafer's guide](https://www.youtube.com/watch?v=MwZwr5Tvyxo&list=PL-osiE80TeTs4UjLw5MM6OjgkjFeUxCYH) on Flask.
