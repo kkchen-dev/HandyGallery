@@ -1,0 +1,17 @@
+{
+    "title": "<title>",
+    "thumbnail": null,
+    "tags": {
+        "<tag_type>:": [
+            "<tag>",
+            "<tag>"
+        ],
+        "<tag_type>:": [
+            "<tag>",
+            "<tag>"
+        ]
+    },
+    "contents": [],
+    "date_added": "",
+    "read": false
+}

@@ -21,6 +21,7 @@ Requires the following libraries.
 ```
     pip install --upgrade flask
     pip install --upgrade flask-wtf
+    pip install --upgrade pymongo
 ```
 
 ## Built With
