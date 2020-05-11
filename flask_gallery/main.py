@@ -39,23 +39,29 @@ def home():
                           )
 
 
-@app.route("/gallery", methods=["GET", "POST"])
+@app.route("/gallery")
 def gallery():
     return render_gallery(1, "None", 1, 0)
 
 
-@app.route("/gallery/p<int:page>.<int:allbooks>.<int:read>.<string:tag>", methods=["GET", "POST"])
+@app.route("/gallery/p<int:page>.<int:allbooks>.<int:read>.<string:tag>")
 def render_gallery(page, tag, allbooks, read):
+    split_tag = tag.split("+")
+    if len(set(split_tag)) < len(split_tag):
+        tag = "+".join(list(set(split_tag)))
+        return redirect(url_for("render_gallery", page=page, tag=tag, allbooks=allbooks, read=read))
+    
     if tag == "None":
+        tag = ""
         if allbooks:
             books = galleryDB.get_all_books()
         else:
             books = galleryDB.get_books_by_wether_read(read=read)
     else:
         if allbooks:
-            books = galleryDB.get_books_bytag(tag)
+            books = galleryDB.get_books_bytags(split_tag)
         else:
-            books = galleryDB.get_books_bytag(tag, bool(read))
+            books = galleryDB.get_books_bytags(split_tag, bool(read))
     
     tagdict = galleryDB.get_all_tags(books)
     valcounts = sorted([b for value in tagdict.values() for a, b in value])
@@ -75,7 +81,9 @@ def render_gallery(page, tag, allbooks, read):
                            page=page, 
                            total_pages=total_pages,
                            books=books, 
-                           tags=tagdict,
+                           tagtypes=sorted(list(tagdict.keys())),
+                           tagdict=tagdict,
+                           selected_tag=tag,
                            maxcounts=maxcounts,
                            allbooks=allbooks,
                            read=read

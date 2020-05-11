@@ -18,13 +18,42 @@
     <div class="button-container row justify-content-center" style="margin-top: 10px;">
         <button type="button" class="btn btn-secondary btn-sm col-2" onclick="toggle_tag_container()">Toggle Tag Container</button>
     </div>
+    <div>
+        {% if selected_tag %}
+            {% set split_tags = selected_tag.split("+") %}
+            {% for i in range(split_tags | length) %}
+                {% set tag = '+'.join(split_tags[:i]+split_tags[i+1:]) %}
+                {% if tag %}
+                    {% set url = url_for('render_gallery', page=1, tag=tag, allbooks=allbooks, read=read) %}
+                {% else %}
+                    {% set url = url_for('gallery') %}
+                {% endif %}
+                <a class="tags" style="margin-right:5px" href="{{ url }}">
+                    <span style="color: #222; 
+                                 padding: 0px 2px 0px 3px;
+                                 margin-right: 5px;
+                                 border-radius: 5px;
+                                 text-align: center;
+                                 background-color:red; 
+                                 font-weight: bold;">-
+                    </span>
+                    {{ split_tags[i] }}
+                </a>
+            {% endfor %}
+        {% endif %}
+    </div>
     <div id="tag_container" class="content-section">
-        {% for tagtype in tags %}
+        {% if selected_tag %}
+            {% set tag_string = selected_tag + "+" %}
+        {% else %}
+            {% set tag_string = "" %}
+        {% endif %}
+        {% for tagtype in tagtypes %}
             <span style="font-size: 10px;">{{ tagtype }}:</span>
-            {% for tag, tagcount in tags[tagtype] %}
+            {% for tag, tagcount in tagdict[tagtype] %}
                 <a class="tags" href="{{ url_for('render_gallery', 
                                                  page=1, 
-                                                 tag=tagtype+':'+tag, 
+                                                 tag=tag_string+tagtype+':'+tag, 
                                                  allbooks=allbooks, 
                                                  read=read) }}">
                     {{ tag }}
@@ -40,13 +69,12 @@
                     {% else %}
                         {% set count_color = "rgb(255, 255, 255)" %}
                     {% endif %}
-                    <span style=" 
-                            color: #222; 
-                            padding: 0px 1px 0px 2px;
-                            border-radius: 3px;
-                            text-align: center;
-                            background-color:{{ count_color }}; 
-                            font-weight: bold;">
+                    <span style="color: #222; 
+                                 padding: 0px 1px 0px 2px;
+                                 border-radius: 3px;
+                                 text-align: center;
+                                 background-color:{{ count_color }}; 
+                                 font-weight: bold;">
                         {{ tagcount }}
                     </span>
                 </a>
@@ -73,12 +101,14 @@
                         {% set next_href = "#" %}
                         {% set rbutton = "background-color: #666;" %}
                     {% endif %}
+                    {% set page_start = ([([1, page - 4] | max), total_pages - 10] | min) %}
+                    {% set page_end = ([([total_pages, page + 5] | min), 12] | max) %}
                     <td class="pbb_table" style="{{ lbutton }}"><a class="page_buttons" href="{{ prev_href }}">&lt;</a></td>
                     <td class="pbb_table" style="{{ lbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=1, tag='None', allbooks=allbooks, read=read) }}">1</a></td>
                     {% if page > 6 %}
                     <td class="pbb_table" style="padding: 0px 5px 0px 5px;"> . . . </td>
                     {% endif %}
-                    {% for pb in range(page-4, page+5) %}
+                    {% for pb in range(page_start, page_end) %}
                         {% if 1 < pb < total_pages %}
                             {% if pb == page %}
                                 {% set cbutton = "background-color: #666;" %}
@@ -131,7 +161,7 @@
                     {% if page > 6 %}
                     <td class="pbb_table" style="padding: 0px 5px 0px 5px;"> . . . </td>
                     {% endif %}
-                    {% for pb in range(page-4, page+5) %}
+                    {% for pb in range(page_start, page_end) %}
                         {% if 1 < pb < total_pages %}
                             {% if pb == page %}
                                 {% set cbutton = "background-color: #666;" %}
