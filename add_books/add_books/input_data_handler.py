@@ -44,7 +44,7 @@ class InputDataHandler:
         if jpgsets:
             print(f"\033[33mUnused JPG Warning:\033[m Folder: \"{folder}\" has unused JPG files: {list(jpgsets)}")
         if missing_page_nums:
-            print(f"\033[33mMissing JPG Warning:\033[m Folder: \"{folder}\" has potentially missing JPG files: {[f'{i}.jpg' for i in missing_page_nums]}")
+            print(f"\033[33mMissing JPG Warning:\033[m Folder: \"{folder}\" has potentially missing JPG files: {[page_num for page_num in missing_page_nums]}")
         return contents
 
 
