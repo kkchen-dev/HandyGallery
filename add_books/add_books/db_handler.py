@@ -37,7 +37,7 @@ class DBHandler:
         with open(metadata_json_path) as f:
             book = json.load(f)
         
-        if self.books.count_documents({"title": book["title"]}) < 0:
+        if self.books.count_documents({"title": book["title"]}) > 0:
             print("\033[33mWarning:\033[m Book Exists: Book is not added.")
         elif not self.check_contents(contents):
             print("\033[31mError:\033[m Empty Page Found: Book is not added.")
