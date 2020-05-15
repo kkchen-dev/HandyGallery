@@ -5,7 +5,7 @@ from wtforms.validators import DataRequired, Length
 
 class SearchForm(FlaskForm):
     key_phrases = StringField("Key Phrases", validators=[DataRequired(), Length(max=100)])
-    submit = SubmitField("Search Title")
+    submit = SubmitField("Search")
 
 
 class BookDeletion(FlaskForm):
