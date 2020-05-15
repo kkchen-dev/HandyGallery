@@ -5,6 +5,7 @@ from flask import Flask, render_template, redirect, flash, url_for, make_respons
 from forms import SearchForm, BookDeletion
 
 from db_handler import GalleryDB
+import local_search
 
 # WARNING!!!! THIS IS ONLY FOR DEVELOPMENT!!!!
 # NO SECURITY PRACTICE!!!!
@@ -90,57 +91,6 @@ def render_gallery(page, tag, allbooks, read):
                         )
 
 
-def build_key_phraseset(phrase):
-    symbol_set = {"[", "]", "(", ")", ",", 
-                  "?", ";", "{", "}", "-", 
-                  "!", "@", "*", "$", "&", 
-                  ":", "'", "\"", ".", "=", 
-                  "<", ">", "/", "\\", "|",
-                  "+", "`"," "}
-    phraseset, curr_chars = set(), []
-    for c in phrase:
-        if curr_chars and c in symbol_set:
-            phraseset.add("".join(curr_chars))
-            curr_chars = []
-        elif c not in symbol_set:
-            curr_chars.append(c)
-    if curr_chars:
-        phraseset.add("".join(curr_chars))
-    return phraseset
-
-def sliding_window(a, b):
-    if len(a) == 0:
-        return True
-    lena, lenb = len(a), len(b)
-    for i in range(lenb):
-        for j in range(lena):
-            if i + j >= lenb or (i + j < lenb and b[i+j] != a[j]):
-                break
-        else:
-            return True
-    return False
-
-
-def as_all_in_bs(a_s, b_s):
-    match_count = 0
-    for a in a_s:
-        match = False
-        for b in b_s:
-            if sliding_window(a, b):
-                match = True
-                break
-        match_count += match
-    return 0 < len(a_s) == match_count
-
-
-def title_found(book_title, search_phrase):
-    search_phrases = build_key_phraseset(search_phrase)
-    if not search_phrases:
-        return False
-    title_phrases = build_key_phraseset(book_title)
-    return as_all_in_bs(search_phrases, title_phrases)
-
-
 @app.route("/search", methods=["GET", "POST"])
 def search_title():
     all_books = galleryDB.get_all_books()
@@ -148,7 +98,7 @@ def search_title():
     form = SearchForm(csrf_enabled=False)
     if form.validate_on_submit():
         for book in all_books:
-            if title_found(book["title"], form.key_phrases.data):
+            if local_search.title_found(book["title"], form.key_phrases.data):
                 books.append(book)
     # if form.errors:
     #     flash(form.errors, "danger")
