@@ -108,12 +108,37 @@ def build_key_phraseset(phrase):
         phraseset.add("".join(curr_chars))
     return phraseset
 
+def sliding_window(a, b):
+    if len(a) == 0:
+        return True
+    lena, lenb = len(a), len(b)
+    for i in range(lenb):
+        for j in range(lena):
+            if i+j >= lenb or b[i+j] != a[j]:
+                break
+        else:
+            return True
+    return False
 
-def title_found(book_title, search_phrases):
+
+def as_all_in_bs(a_s, b_s):
+    match_count = 0
+    for a in a_s:
+        match = False
+        for b in b_s:
+            if sliding_window(a, b):
+                match = True
+                break
+        match_count += match
+    return 0 < len(a_s) == match_count
+
+
+def title_found(book_title, search_phrase):
+    search_phrases = build_key_phraseset(search_phrase)
     if not search_phrases:
         return False
     title_phrases = build_key_phraseset(book_title)
-    return not bool(search_phrases - title_phrases)
+    return as_all_in_bs(search_phrases, title_phrases)
 
 
 @app.route("/search", methods=["GET", "POST"])
@@ -123,7 +148,7 @@ def search_title():
     form = SearchForm(csrf_enabled=False)
     if form.validate_on_submit():
         for book in all_books:
-            if title_found(book["title"], build_key_phraseset(form.key_phrases.data)):
+            if title_found(book["title"], form.key_phrases.data):
                 books.append(book)
     # if form.errors:
     #     flash(form.errors, "danger")
@@ -146,7 +171,7 @@ def bookpage(book_id):
             return redirect(url_for("home"))
         flash("Book Not Deleted: Please confirm the deletion.", "danger")
     return render_template("book.html",
-                            title="Book",
+                            title=book["title"],
                             book_id=book_id,
                             imgs=book["contents"],
                             tags=book["tags"],
