@@ -114,7 +114,7 @@ def sliding_window(a, b):
     lena, lenb = len(a), len(b)
     for i in range(lenb):
         for j in range(lena):
-            if i+j >= lenb or b[i+j] != a[j]:
+            if i + j >= lenb or (i + j < lenb and b[i+j] != a[j]):
                 break
         else:
             return True
