@@ -87,15 +87,20 @@
         <div>
             <table class="page_button_bars pbb_table">
                 <tr class="pbb_table">
+                    {% if (tag_string | length) == 0 %}
+                        {% set tag_string = "None" %}
+                    {% else %}
+                        {% set tag_string = tag_string[:-1] %}
+                    {% endif %}
                     {% if page > 1 %}
-                        {% set prev_href = url_for('render_gallery', page=page-1, tag='None', allbooks=allbooks, read=read) %}
+                        {% set prev_href = url_for('render_gallery', page=page-1, tag=tag_string, allbooks=allbooks, read=read) %}
                         {% set lbutton = "background-color: initial;" %}
                     {% else %}
                         {% set prev_href = "#" %}
                         {% set lbutton = "background-color: #666;" %}
                     {% endif %}
                     {% if page < total_pages %}
-                        {% set next_href = url_for('render_gallery', page=page+1, tag='None', allbooks=allbooks, read=read) %}
+                        {% set next_href = url_for('render_gallery', page=page+1, tag=tag_string, allbooks=allbooks, read=read) %}
                         {% set rbutton = "background-color: initial;" %}
                     {% else %}
                         {% set next_href = "#" %}
@@ -104,7 +109,7 @@
                     {% set page_start = ([([1, page - 4] | max), total_pages - 10] | min) %}
                     {% set page_end = ([([total_pages, page + 5] | min), 12] | max) %}
                     <td class="pbb_table" style="{{ lbutton }}"><a class="page_buttons" href="{{ prev_href }}">&lt;</a></td>
-                    <td class="pbb_table" style="{{ lbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=1, tag='None', allbooks=allbooks, read=read) }}">1</a></td>
+                    <td class="pbb_table" style="{{ lbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=1, tag=tag_string, allbooks=allbooks, read=read) }}">1</a></td>
                     {% if page > 6 %}
                     <td class="pbb_table" style="padding: 0px 5px 0px 5px;"> . . . </td>
                     {% endif %}
@@ -115,14 +120,14 @@
                             {% else %}
                                 {% set cbutton = "background-color: initial;" %}
                             {% endif %}
-                            <td class="pbb_table" style="{{ cbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=pb, tag='None', allbooks=allbooks, read=read) }}">{{ pb }}</a></td>
+                            <td class="pbb_table" style="{{ cbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=pb, tag=tag_string, allbooks=allbooks, read=read) }}">{{ pb }}</a></td>
                         {% endif %}
                     {% endfor %}
                     {% if page < total_pages - 5 %}
                     <td class="pbb_table" style="padding: 0px 5px 0px 5px;"> . . . </td>
                     {% endif %}
                     {% if total_pages > 1 %}
-                        <td class="pbb_table" style="{{ rbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=total_pages, tag='None', allbooks=allbooks, read=read) }}">{{ total_pages }}</a></td>
+                        <td class="pbb_table" style="{{ rbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=total_pages, tag=tag_string, allbooks=allbooks, read=read) }}">{{ total_pages }}</a></td>
                     {% endif %}
                     <td class="pbb_table" style="{{ rbutton }}"><a class="page_buttons" href="{{ next_href }}">&gt;</a></td>
                 </tr>
@@ -157,7 +162,7 @@
             <table class="page_button_bars pbb_table">
                 <tr class="pbb_table">
                     <td class="pbb_table" style="{{ lbutton }}"><a class="page_buttons" href="{{ prev_href }}">&lt;</a></td>
-                    <td class="pbb_table" style="{{ lbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=1, tag='None', allbooks=allbooks, read=read) }}">1</a></td>
+                    <td class="pbb_table" style="{{ lbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=1, tag=tag_string, allbooks=allbooks, read=read) }}">1</a></td>
                     {% if page > 6 %}
                     <td class="pbb_table" style="padding: 0px 5px 0px 5px;"> . . . </td>
                     {% endif %}
@@ -168,14 +173,14 @@
                             {% else %}
                                 {% set cbutton = "background-color: initial;" %}
                             {% endif %}
-                            <td class="pbb_table" style="{{ cbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=pb, tag='None', allbooks=allbooks, read=read) }}">{{ pb }}</a></td>
+                            <td class="pbb_table" style="{{ cbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=pb, tag=tag_string, allbooks=allbooks, read=read) }}">{{ pb }}</a></td>
                         {% endif %}
                     {% endfor %}
                     {% if page < total_pages - 5 %}
                     <td class="pbb_table" style="padding: 0px 5px 0px 5px;"> . . . </td>
                     {% endif %}
                     {% if total_pages > 1 %}
-                        <td class="pbb_table" style="{{ rbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=total_pages, tag='None', allbooks=allbooks, read=read) }}">{{ total_pages }}</a></td>
+                        <td class="pbb_table" style="{{ rbutton }}"><a class="page_buttons" href="{{ url_for('render_gallery', page=total_pages, tag=tag_string, allbooks=allbooks, read=read) }}">{{ total_pages }}</a></td>
                     {% endif %}
                     <td class="pbb_table" style="{{ rbutton }}"><a class="page_buttons" href="{{ next_href }}">&gt;</a></td>
                 </tr>
